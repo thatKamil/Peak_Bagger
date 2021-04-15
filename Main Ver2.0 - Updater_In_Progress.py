@@ -1,7 +1,8 @@
 ######################################################################################################################
 ### Version 2.0
 ######################################################################################################################
-# CSV max signal output CSV
+# Work in progress:
+# Auto update of latest file in directory
 
 
 ######################################################################################################################
@@ -12,8 +13,7 @@ from tkinter import *
 from tkinter import filedialog
 import csv
 import matplotlib.pyplot as plt
-import getpass
-import os, sys
+import os
 import glob
 
 ######################################################################################################################
@@ -21,28 +21,20 @@ import glob
 ######################################################################################################################
 
 
-def openCSV():
-    cwd = os.getcwd()
-
-    newpath = r(user_directory)
-    if not os.path.exists(newpath):
-        os.makedirs(newpath)
-
-    list_of_files = glob.glob(user_directory)  # * means all if need specific format then *.csv
-    latest_file = max(list_of_files, key=os.path.getctime)
-    print(latest_file)
-
-    tf = lastest_file
-
-    return tf
-
-
+def selectDirectory():
+    """Select directory where ouput CSV's are located.
+       Outputs the absolute path of the oldest CSV in the dirctory."""
+    mainWindow.directory = filedialog.askdirectory()
+    os.chdir(mainWindow.directory)
+    list_of_files = glob.glob("*.csv")  # Creates a list of all CSV's in the directory
+    fileName = max(list_of_files, key=os.path.getctime) # Determines the newest CSV
+    fileLocation = mainWindow.directory + '/' + fileName # Creates absolute path of the newest CSV
+    return fileLocation
 
 def singleGraph():
     '''Creates a single graph with 1 to 5 plots depending on the number of inputs'''
-    tf = csvPath.get(1.0, END)
-    tf1 = tf[:-1]
-    with open(tf1, 'r') as fh:
+    tf = selectDirectory()
+    with open(tf, 'r') as fh:
         reader = csv.reader(fh)
         next(reader)
 
@@ -97,11 +89,9 @@ def singleGraph():
 
         plt.show()
 
-def multipleGraphs():
-    tf = csvPath.get(1.0, END)
-    tf1 = tf[:-1]
+def multipleGraphs(tf):
 
-    with open(tf1, 'r') as fh:
+    with open(tf, 'r') as fh:
         reader = csv.reader(fh)
         next(reader)
 
@@ -252,18 +242,18 @@ def multipleGraphs():
 ### ''' GUI Interface Setup '''
 ######################################################################################################################
 # Main windows setup
-ws = Tk()   # Links main window to the interpreter
-ws.title("IVIS Plateua Visualiser by Kamil_Sokolowski")
-ws.geometry("410x150+500+300") # Window size and initial position
-ws['bg']='khaki1' # Background colour
+mainWindow = Tk()   # Links main window to the interpreter
+mainWindow.title("IVIS Plateua Visualiser by Kamil_Sokolowski")
+mainWindow.geometry("410x150+500+300") # Window size and initial position
+mainWindow['bg']= 'khaki1' # Background colour
 
 # Log file path output text areas
-csvPath = Text(ws, width=48, height=1, bg='old lace')
+csvPath = Text(mainWindow, width=48, height=1, bg='old lace')
 csvPath.place(x=10, y=60)
 
 # Main buttons
-Button(ws, text="Open Export Location", command=openCSV, height=2, width=30).place(x=100, y=10)
-Button(ws, text="Single Graph", command=singleGraph, height=2, width=25).place(x=9, y=90)
-Button(ws, text="Multiple Graphs", command=multipleGraphs, height=2, width=25).place(x=210, y=90)
+Button(mainWindow, text="Open Export Location", command=selectDirectory, height=2, width=30).place(x=100, y=10)
+Button(mainWindow, text="Single Graph", command=singleGraph, height=2, width=25).place(x=9, y=90)
+Button(mainWindow, text="Multiple Graphs", command=multipleGraphs, height=2, width=25).place(x=210, y=90)
 
-ws.mainloop()
+mainWindow.mainloop()
