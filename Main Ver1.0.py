@@ -55,25 +55,17 @@ def singleGraph():
                 x5.append(int(time))
                 y5.append(float(signal))
 
-        roi_count = 0
 
         if len(x1) > 0:
             plt.plot(x1, y1, label='ROI 1')
-            roi_count += 1
         if len(x2) > 0:
             plt.plot(x2, y2, label='ROI 2')
-            roi_count += 1
         if len(x3) > 0:
             plt.plot(x3, y3, label='ROI 3')
-            roi_count += 1
         if len(x4) > 0:
             plt.plot(x4, y4, label='ROI 4')
-            roi_count += 1
         if len(x5) > 0:
             plt.plot(x5, y5, label='ROI 5')
-            roi_count += 1
-
-        print(roi_count)
 
         plt.ylabel('Signal (Photons/second)')
         plt.xlabel('Timepoint (Minutes)')

@@ -16,20 +16,20 @@ import matplotlib.pyplot as plt
 from tkinter import *
 from tkinter import filedialog
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
+import matplotlib.gridspec as gridspec
+
 
 ######################################################################################################################
 ### Functions
 ######################################################################################################################
 
-directoryLocation = ''
-
 def selectDirectory():
     """Select directory where output CSV's are located.
        Outputs the absolute path of the oldest CSV in the directory."""
+
     mainWindow.directory = filedialog.askdirectory()
     os.chdir(mainWindow.directory)
-    directoryLocation = mainWindow.directory
 
 
 def singleGraph():
@@ -39,21 +39,24 @@ def singleGraph():
     fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
     fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
 
-    fig = Figure(figsize=(5, 5), dpi=100)
-    plt = fig.add_subplot(111)
+    singleGraph = Figure(figsize=(5, 5), dpi=100)
+    plt = singleGraph.add_subplot(111)
 
     with open(fileLocation, 'r') as fh:
         reader = csv.reader(fh)
         next(reader)
 
+        # Creates a list for each potential ROI.
         x1, x2, x3, x4, x5 = ([] for i in range(5))
         y1, y2, y3, y4, y5 = ([] for i in range(5))
 
+        # Selects specific information from the CSV
         for row in reader:
             time = (row[0])[-2:]
             roi = (row[1])[-1]
             signal = row[5]
 
+            # Appends collected information to the associated list.
             if roi == '1':
                 x1.append(int(time))
                 y1.append(float(signal))
@@ -70,42 +73,34 @@ def singleGraph():
                 x5.append(int(time))
                 y5.append(float(signal))
 
-        roi_count = 0
-
+        # If any values exist in the associated ROI list, the values are plotted
         if len(x1) > 0:
             plt.plot(x1, y1, label='ROI 1')
-            roi_count += 1
         if len(x2) > 0:
             plt.plot(x2, y2, label='ROI 2')
-            roi_count += 1
         if len(x3) > 0:
             plt.plot(x3, y3, label='ROI 3')
-            roi_count += 1
         if len(x4) > 0:
             plt.plot(x4, y4, label='ROI 4')
-            roi_count += 1
         if len(x5) > 0:
             plt.plot(x5, y5, label='ROI 5')
-            roi_count += 1
 
-
-        canvas = FigureCanvasTkAgg(fig, master=mainWindow)
+        canvas = FigureCanvasTkAgg(singleGraph, master=mainWindow)
+        canvas.get_tk_widget().place(x=10, y=150)
+        plt.set_ylabel('Signal (Photons/second)')
+        plt.set_xlabel('Timepoint (Minutes)')
+        plt.set_title('IVIS Signal Peak')
+        plt.legend(loc='lower right')
         canvas.draw()
-        canvas.get_tk_widget().pack()
-        # toolbar = NavigationToolbar2Tk(canvas,mainWindow)
-        # toolbar.update()
-        # canvas.get_tk_widget().pack()
-        plt.ylabel('Signal (Photons/second)')
-        plt.xlabel('Timepoint (Minutes)')
-        plt.title('IVIS Signal Peak')
-        plt.legend()
-        plt.show()
+
 
 def multipleGraphs():
-
     list_of_files = glob.glob("*.csv")  # Creates a list of all CSV's in the directory
     fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
     fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
+
+    multipleGraph = Figure(figsize=(5, 5), dpi=100)
+    plt = multipleGraph.add_subplot(111)
 
     with open(fileLocation, 'r') as fh:
         reader = csv.reader(fh)
@@ -251,20 +246,22 @@ def multipleGraphs():
             ax5.set_title('ROI 5')
             ax5.set_xlabel("Time")
 
-        plt.suptitle('IVIS Plateau Graphs')
-        plt.show()
+        canvas = FigureCanvasTkAgg(multipleGraph, master=mainWindow)
+        canvas.get_tk_widget().place(x=10, y=150)
+        canvas.draw()
+
 
 ######################################################################################################################
 ### ''' GUI Interface Setup '''
 ######################################################################################################################
 # Main windows setup
-mainWindow = Tk()   # Links main window to the interpreter
-mainWindow.title("IVIS Plateua Visualiser by Kamil_Sokolowski")
-mainWindow.geometry("1000x800+500+300") # Window size and initial position
-mainWindow['bg']= 'khaki1' # Background colour
+mainWindow = Tk()  # Links main window to the interpreter
+mainWindow.title("IVIS Plateau Visualiser by Kamil_Sokolowski")
+mainWindow.geometry("500x650+100+25")  # Window size and initial position
+mainWindow['bg'] = 'white'  # Background colour
 
 # Log file path output text areas
-csvPath = Text(mainWindow, width=48, height=1, bg='old lace')
+csvPath = Text(mainWindow, width=48, height=1, bg='white')
 csvPath.place(x=10, y=60)
 
 # Main buttons
