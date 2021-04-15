@@ -9,32 +9,40 @@
 ### Initialisation
 ######################################################################################################################
 
-from tkinter import *
-from tkinter import filedialog
 import csv
-import matplotlib.pyplot as plt
 import os
 import glob
+import matplotlib.pyplot as plt
+from tkinter import *
+from tkinter import filedialog
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 ######################################################################################################################
 ### Functions
 ######################################################################################################################
 
+directoryLocation = ''
 
 def selectDirectory():
-    """Select directory where ouput CSV's are located.
-       Outputs the absolute path of the oldest CSV in the dirctory."""
+    """Select directory where output CSV's are located.
+       Outputs the absolute path of the oldest CSV in the directory."""
     mainWindow.directory = filedialog.askdirectory()
     os.chdir(mainWindow.directory)
-    list_of_files = glob.glob("*.csv")  # Creates a list of all CSV's in the directory
-    fileName = max(list_of_files, key=os.path.getctime) # Determines the newest CSV
-    fileLocation = mainWindow.directory + '/' + fileName # Creates absolute path of the newest CSV
-    return fileLocation
+    directoryLocation = mainWindow.directory
+
 
 def singleGraph():
     '''Creates a single graph with 1 to 5 plots depending on the number of inputs'''
-    tf = selectDirectory()
-    with open(tf, 'r') as fh:
+
+    list_of_files = glob.glob("*.csv")  # Creates a list of all CSV's in the directory
+    fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
+    fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
+
+    fig = Figure(figsize=(5, 5), dpi=100)
+    plt = fig.add_subplot(111)
+
+    with open(fileLocation, 'r') as fh:
         reader = csv.reader(fh)
         next(reader)
 
@@ -80,18 +88,26 @@ def singleGraph():
             plt.plot(x5, y5, label='ROI 5')
             roi_count += 1
 
-        print(roi_count)
 
+        canvas = FigureCanvasTkAgg(fig, master=mainWindow)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+        # toolbar = NavigationToolbar2Tk(canvas,mainWindow)
+        # toolbar.update()
+        # canvas.get_tk_widget().pack()
         plt.ylabel('Signal (Photons/second)')
         plt.xlabel('Timepoint (Minutes)')
         plt.title('IVIS Signal Peak')
         plt.legend()
-
         plt.show()
 
-def multipleGraphs(tf):
+def multipleGraphs():
 
-    with open(tf, 'r') as fh:
+    list_of_files = glob.glob("*.csv")  # Creates a list of all CSV's in the directory
+    fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
+    fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
+
+    with open(fileLocation, 'r') as fh:
         reader = csv.reader(fh)
         next(reader)
 
@@ -244,7 +260,7 @@ def multipleGraphs(tf):
 # Main windows setup
 mainWindow = Tk()   # Links main window to the interpreter
 mainWindow.title("IVIS Plateua Visualiser by Kamil_Sokolowski")
-mainWindow.geometry("410x150+500+300") # Window size and initial position
+mainWindow.geometry("1000x800+500+300") # Window size and initial position
 mainWindow['bg']= 'khaki1' # Background colour
 
 # Log file path output text areas
