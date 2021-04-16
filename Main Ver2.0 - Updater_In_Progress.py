@@ -5,6 +5,7 @@
 import csv
 import os
 import glob
+from matplotlib.figure import Figure
 from tkinter import *
 from tkinter import filedialog
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
@@ -88,7 +89,6 @@ def multipleGraphs():
     fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
 
     multipleGraph = Figure(figsize=(8, 6), dpi=100)
-
 
     with open(fileLocation, 'r') as fh:
         reader = csv.reader(fh)
@@ -194,6 +194,9 @@ def multipleGraphs():
             ax4.set_title('ROI 4')
             ax4.set_xlabel("Time")
             ax4.set_ylabel("Signal")
+
+        # Generate output graph for 5 ROI's
+        if roi_count == 5:
 
             ax1 = multipleGraph.add_subplot(231)
             ax1.plot(x1, y1)
