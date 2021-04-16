@@ -1,24 +1,13 @@
 ######################################################################################################################
-### Version 2.0
-######################################################################################################################
-# Work in progress:
-# Auto update of latest file in directory
-
-
-######################################################################################################################
 ### Initialisation
 ######################################################################################################################
 
 import csv
 import os
 import glob
-import matplotlib.pyplot as plt
 from tkinter import *
 from tkinter import filedialog
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
-import matplotlib.gridspec as gridspec
-
 
 ######################################################################################################################
 ### Functions
@@ -39,7 +28,7 @@ def singleGraph():
     fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
     fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
 
-    singleGraph = Figure(figsize=(5, 5), dpi=100)
+    singleGraph = Figure(figsize=(5, 6), dpi=100)
     plt = singleGraph.add_subplot(111)
 
     with open(fileLocation, 'r') as fh:
@@ -86,12 +75,11 @@ def singleGraph():
             plt.plot(x5, y5, label='ROI 5')
 
         canvas = FigureCanvasTkAgg(singleGraph, master=mainWindow)
-        canvas.get_tk_widget().place(x=10, y=150)
+        canvas.get_tk_widget().place(x=10, y=50)
         plt.set_ylabel('Signal (Photons/second)')
         plt.set_xlabel('Timepoint (Minutes)')
-        plt.set_title('IVIS Signal Peak')
+        plt.set_title('All ROIs')
         plt.legend(loc='lower right')
-        canvas.draw()
 
 
 def multipleGraphs():
@@ -99,8 +87,8 @@ def multipleGraphs():
     fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
     fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
 
-    multipleGraph = Figure(figsize=(5, 5), dpi=100)
-    plt = multipleGraph.add_subplot(111)
+    multipleGraph = Figure(figsize=(8, 6), dpi=100)
+
 
     with open(fileLocation, 'r') as fh:
         reader = csv.reader(fh)
@@ -145,11 +133,8 @@ def multipleGraphs():
 
         # Generate output graph for 1 ROI's
         if roi_count == 1:
-            plt.subplots(figsize=(7, 7))
-            plt.tight_layout(h_pad=2)
-            plt.subplots_adjust(top=0.85, bottom=.12, left=.1)
 
-            ax1 = plt.subplot(111)
+            ax1 = multipleGraph.add_subplot(221)
             ax1.plot(x1, y1)
             ax1.set_title('ROI 1')
             ax1.set_ylabel("Signal")
@@ -157,98 +142,85 @@ def multipleGraphs():
 
         # Generate output graph for 2 ROI's
         if roi_count == 2:
-            plt.subplots(figsize=(10, 4))
-            plt.tight_layout(h_pad=2)
-            plt.subplots_adjust(top=0.85, bottom=.12, left=.1)
 
-            ax1 = plt.subplot(121)
+            ax1 = multipleGraph.add_subplot(221)
             ax1.plot(x1, y1)
             ax1.set_title('ROI 1')
             ax1.set_ylabel("Signal")
             ax1.set_xlabel("Time")
 
-            ax2 = plt.subplot(122)
+            ax2 = multipleGraph.add_subplot(222)
             ax2.plot(x2, y2)
             ax2.set_title('ROI 2')
             ax2.set_xlabel("Time")
 
         # Generate output graph for 3 ROI's
         if roi_count == 3:
-            plt.subplots(figsize=(10, 4))
-            plt.tight_layout(h_pad=2)
-            plt.subplots_adjust(top=0.85, bottom=.12, left=.1)
 
-            ax1 = plt.subplot(131)
+            ax1 = multipleGraph.add_subplot(221)
             ax1.plot(x1, y1)
             ax1.set_title('ROI 1')
             ax1.set_ylabel("Signal")
             ax1.set_xlabel("Time")
 
-            ax2 = plt.subplot(132)
+            ax2 = multipleGraph.add_subplot(222)
             ax2.plot(x2, y2)
             ax2.set_title('ROI 2')
             ax2.set_xlabel("Time")
 
-            ax3 = plt.subplot(133)
+            ax3 = multipleGraph.add_subplot(223)
             ax3.plot(x3, y3)
             ax3.set_title('ROI 3')
             ax3.set_xlabel("Time")
 
         # Generate output graph for 4 ROI's
         if roi_count == 4:
-            fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10, 7))
-            fig.tight_layout(h_pad=2)
-            plt.subplots_adjust(top=0.92, bottom=.09, left=.1)
 
-            axes[0, 0].set_title("ROI 1")
-            axes[0, 0].plot(x1, y1, color='C0')
-            axes[0, 0].set_ylabel("Signal")
-
-            axes[0, 1].set_title("ROI 2")
-            axes[0, 1].plot(x2, y2, color='C0')
-
-            axes[1, 0].set_title("ROI 3")
-            axes[1, 0].plot(x3, y3, color='C0')
-            axes[1, 0].set_xlabel("Time")
-            axes[1, 0].set_ylabel("Signal")
-
-            axes[1, 1].set_title("ROI 4")
-            axes[1, 1].plot(x4, y4, color='C0')
-            axes[1, 1].set_xlabel("Time")
-
-        # Generate output graph for 5 ROI's
-        if roi_count == 5:
-            plt.subplots(figsize=(10, 7))
-            plt.tight_layout(h_pad=2)
-            plt.subplots_adjust(top=0.9, bottom=.09, left=.1)
-
-            ax1 = plt.subplot(231)
+            ax1 = multipleGraph.add_subplot(221)
             ax1.plot(x1, y1)
             ax1.set_title('ROI 1')
             ax1.set_ylabel("Signal")
 
-            ax2 = plt.subplot(232)
+            ax2 = multipleGraph.add_subplot(222)
             ax2.plot(x2, y2)
             ax2.set_title('ROI 2')
 
-            ax3 = plt.subplot(233)
+            ax3 = multipleGraph.add_subplot(223)
             ax3.plot(x3, y3)
             ax3.set_title('ROI 3')
 
-            ax4 = plt.subplot(234)
+            ax4 = multipleGraph.add_subplot(224)
             ax4.plot(x4, y4)
             ax4.set_title('ROI 4')
             ax4.set_xlabel("Time")
             ax4.set_ylabel("Signal")
 
-            ax5 = plt.subplot(235)
+            ax1 = multipleGraph.add_subplot(231)
+            ax1.plot(x1, y1)
+            ax1.set_title('ROI 1')
+            ax1.set_ylabel("Signal")
+
+            ax2 = multipleGraph.add_subplot(232)
+            ax2.plot(x2, y2)
+            ax2.set_title('ROI 2')
+
+            ax3 = multipleGraph.add_subplot(233)
+            ax3.plot(x3, y3)
+            ax3.set_title('ROI 3')
+
+            ax4 = multipleGraph.add_subplot(234)
+            ax4.plot(x4, y4)
+            ax4.set_title('ROI 4')
+            ax4.set_xlabel("Time")
+            ax4.set_ylabel("Signal")
+
+            ax5 = multipleGraph.add_subplot(235)
             ax5.plot(x5, y5)
             ax5.set_title('ROI 5')
             ax5.set_xlabel("Time")
 
-        canvas = FigureCanvasTkAgg(multipleGraph, master=mainWindow)
-        canvas.get_tk_widget().place(x=10, y=150)
-        canvas.draw()
+        canvas2 = FigureCanvasTkAgg(multipleGraph, master=mainWindow)
+        canvas2.get_tk_widget().place(x=470, y=50)
 
 
 ######################################################################################################################
@@ -256,17 +228,13 @@ def multipleGraphs():
 ######################################################################################################################
 # Main windows setup
 mainWindow = Tk()  # Links main window to the interpreter
-mainWindow.title("IVIS Plateau Visualiser by Kamil_Sokolowski")
-mainWindow.geometry("500x650+100+25")  # Window size and initial position
+mainWindow.title("IVIS Peak Grabber by Kamil_Sokolowski")
+mainWindow.geometry("1260x650+10+10")  # Window size and initial position
 mainWindow['bg'] = 'white'  # Background colour
 
-# Log file path output text areas
-csvPath = Text(mainWindow, width=48, height=1, bg='white')
-csvPath.place(x=10, y=60)
-
 # Main buttons
-Button(mainWindow, text="Open Export Location", command=selectDirectory, height=2, width=30).place(x=100, y=10)
-Button(mainWindow, text="Single Graph", command=singleGraph, height=2, width=25).place(x=9, y=90)
-Button(mainWindow, text="Multiple Graphs", command=multipleGraphs, height=2, width=25).place(x=210, y=90)
+Button(mainWindow, text="Open Export Location", command=selectDirectory, height=2, width=30).place(x=10, y=10)
+Button(mainWindow, text="Single Graph", command=singleGraph, height=2, width=25).place(x=250, y=10)
+Button(mainWindow, text="Multiple Graphs", command=multipleGraphs, height=2, width=25).place(x=450, y=10)
 
 mainWindow.mainloop()
