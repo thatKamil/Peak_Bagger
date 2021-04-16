@@ -24,6 +24,7 @@ import getpass
 # latest_file = max(list_of_files, key=os.path.getctime)
 # print(latest_file)
 
-# print(os.getcwd())
-# os.chdir("C:\\Users\\tksokolo1\\Desktop")
-# os.mkdir('PythonProjects')
+
+print(os.getcwd())
+os.chdir("C:\\Users\\tksokolo1\\Desktop")
+os.mkdir('PythonProjects')
