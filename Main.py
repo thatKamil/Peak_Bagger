@@ -5,10 +5,10 @@
 import csv
 import os
 import glob
-from matplotlib.figure import Figure
 from tkinter import *
 from tkinter import filedialog
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 ######################################################################################################################
 ### Functions
@@ -17,14 +17,12 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg)
 def selectDirectory():
     """Select directory where output CSV's are located.
        Outputs the absolute path of the oldest CSV in the directory."""
-
     mainWindow.directory = filedialog.askdirectory()
     os.chdir(mainWindow.directory)
 
 
-def singleGraph():
-    '''Creates a single graph with 1 to 5 plots depending on the number of inputs'''
-
+def startProgram():
+    '''Main program. Finds newest csv, parses the information and plots it'''
     list_of_files = glob.glob("*.csv")  # Creates a list of all CSV's in the directory
     fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
     fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
@@ -82,12 +80,6 @@ def singleGraph():
         plt.set_title('All ROIs')
         plt.legend(loc='lower right')
 
-
-def multipleGraphs():
-    list_of_files = glob.glob("*.csv")  # Creates a list of all CSV's in the directory
-    fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
-    fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
-
     multipleGraph = Figure(figsize=(8, 6), dpi=100)
 
     with open(fileLocation, 'r') as fh:
@@ -133,7 +125,6 @@ def multipleGraphs():
 
         # Generate output graph for 1 ROI's
         if roi_count == 1:
-
             ax1 = multipleGraph.add_subplot(221)
             ax1.plot(x1, y1)
             ax1.set_title('ROI 1')
@@ -142,7 +133,6 @@ def multipleGraphs():
 
         # Generate output graph for 2 ROI's
         if roi_count == 2:
-
             ax1 = multipleGraph.add_subplot(221)
             ax1.plot(x1, y1)
             ax1.set_title('ROI 1')
@@ -156,7 +146,6 @@ def multipleGraphs():
 
         # Generate output graph for 3 ROI's
         if roi_count == 3:
-
             ax1 = multipleGraph.add_subplot(221)
             ax1.plot(x1, y1)
             ax1.set_title('ROI 1')
@@ -175,7 +164,6 @@ def multipleGraphs():
 
         # Generate output graph for 4 ROI's
         if roi_count == 4:
-
             ax1 = multipleGraph.add_subplot(221)
             ax1.plot(x1, y1)
             ax1.set_title('ROI 1')
@@ -197,7 +185,6 @@ def multipleGraphs():
 
         # Generate output graph for 5 ROI's
         if roi_count == 5:
-
             ax1 = multipleGraph.add_subplot(231)
             ax1.plot(x1, y1)
             ax1.set_title('ROI 1')
@@ -225,6 +212,8 @@ def multipleGraphs():
         canvas2 = FigureCanvasTkAgg(multipleGraph, master=mainWindow)
         canvas2.get_tk_widget().place(x=470, y=50)
 
+    mainWindow.after(15000, startProgram)
+
 
 ######################################################################################################################
 ### ''' GUI Interface Setup '''
@@ -237,7 +226,6 @@ mainWindow['bg'] = 'white'  # Background colour
 
 # Main buttons
 Button(mainWindow, text="Open Export Location", command=selectDirectory, height=2, width=30).place(x=10, y=10)
-Button(mainWindow, text="Single Graph", command=singleGraph, height=2, width=25).place(x=250, y=10)
-Button(mainWindow, text="Multiple Graphs", command=multipleGraphs, height=2, width=25).place(x=450, y=10)
+Button(mainWindow, text="Start", command=startProgram, height=2, width=25).place(x=250, y=10)
 
 mainWindow.mainloop()
