@@ -235,7 +235,7 @@ def multipleGraphs():
             ax3.plot(x3, y3)
             ax3.set_title('ROI 3')
 
-            ax4 = plt.subplot(234)
+            ax4 = plt.subplot(234)g
             ax4.plot(x4, y4)
             ax4.set_title('ROI 4')
             ax4.set_xlabel("Time")
