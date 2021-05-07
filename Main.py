@@ -14,7 +14,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 ######################################################################################################################
 ### Functions
-######################################################################################################################
+#####################################################################################################################
 
 def selectDirectory():
     """Select directory where output CSV's are located.
@@ -25,12 +25,12 @@ def selectDirectory():
 
 def startProgram():
     '''Main program. Finds newest csv, parses the information and plots it'''
-    print('Program started: ' + str(datetime.datetime.now()))
+    print('\n-------' + 'Program started: ' + str(datetime.datetime.now())) ## DEBUG TOOL
 
     list_of_files = glob.glob("*.csv")  # Creates a list of all CSV's in the directory
     fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
     fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
-    print(fileLocation)
+    print(fileLocation) ## DEBUG TOOL
 
     with open(fileLocation, 'r') as fh:
         reader = csv.reader(fh)
@@ -39,14 +39,14 @@ def startProgram():
         # Creates a list for each potential ROI.
         x1, x2, x3, x4, x5 = ([] for i in range(5))
         y1, y2, y3, y4, y5 = ([] for i in range(5))
-
+        print('After reset x1 = ' + str(x1)) ## DEBUG TOOL
         # Selects specific information from the CSV
         for row in reader:
             timePoint = (row[0])[-2:]
             roi = (row[1])[-1]
             signal = row[5]
 
-            # Appends collected information to the associated list.
+            # Assigns specific information to the relevant list.
             if roi == '1':
                 x1.append(int(timePoint))
                 y1.append(float(signal))
@@ -64,21 +64,24 @@ def startProgram():
                 y5.append(float(signal))
 
         singleGraph = Figure(figsize=(5, 6), dpi=100)
-        canvas = FigureCanvasTkAgg(singleGraph, master=mainWindow)
-        canvas.get_tk_widget().place(x=10, y=50)
+        canvasSingleGraph = FigureCanvasTkAgg(singleGraph, master=mainWindow)
+        canvasSingleGraph.get_tk_widget().place(x=10, y=50)
 
-        canvas3 = Canvas(mainWindow,height=50,width=200,bg='white')
-        canvas3.place(x=500,y=10)
+        # canvasErrors = Canvas(mainWindow, height=50, width=200, bg='white')
+        # canvasErrors.place(x=500, y=10)
 
 
-        if len(x1) <= 1:
-            canvas3.create_text(80,20,text="not enough datapoints")
-            print(x1)
+
+        if len(x1) == 1:
+            # canvasErrors.create_text(80, 20, text="not enough datapoints")
+            errorOutput.delete("1.0", "end")
+            errorOutput.insert(END, datetime.datetime.now())
+            print(x1, y1)
             time.sleep(5)
-            canvas3.delete('all')
+            # canvasErrors.delete('all')
             mainWindow.after(100, startProgram)
         else:
-
+            print(x1,y1, x2, y2)
             plt = singleGraph.add_subplot(111)
 
             # If any values exist in the associated ROI list, the values are plotted
@@ -248,5 +251,9 @@ mainWindow['bg'] = 'white'  # Background colour
 # Main buttons
 Button(mainWindow, text="Open Export Location", command=selectDirectory, height=2, width=30).place(x=10, y=10)
 Button(mainWindow, text="Start", command=startProgram, height=2, width=25).place(x=250, y=10)
+
+errorOutput = Text(mainWindow, width=39, height=1, bg='old lace')
+errorOutput.place(x=600, y=10)
+errorOutput.insert(END, 'No Errors')
 
 mainWindow.mainloop()
