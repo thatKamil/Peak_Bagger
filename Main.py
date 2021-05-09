@@ -28,6 +28,9 @@ def startProgram():
     print('\n-------' + 'Program started: ' + str(datetime.datetime.now())) ## DEBUG TOOL
 
     list_of_files = glob.glob("*.csv")  # Creates a list of all CSV's in the directory
+    print('List of files = ' + str(list_of_files)) # Debug
+    list_of_files.sort()
+    print('List of files post sort ' + str(list_of_files))
     fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
     fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
     print(fileLocation) ## DEBUG TOOL
@@ -50,6 +53,7 @@ def startProgram():
         x1, x2, x3, x4, x5 = ([] for i in range(5))
         y1, y2, y3, y4, y5 = ([] for i in range(5))
         print('After reset x1 should = [] -> ' + str(x1)) ## DEBUG TOOL
+
         # Selects specific information from the CSV
         for row in reader:
             timePoint = (row[0])[-2:]
@@ -87,7 +91,7 @@ def startProgram():
             time.sleep(5)
             mainWindow.after(100, startProgram)
 
-
+        print('Plotting started @ '+ str(datetime.datetime.now()))
         # If any values exist in the associated ROI list, the values are plotted
         if len(x1) > 0:
             plt.plot(x1, y1, label='ROI 1')
