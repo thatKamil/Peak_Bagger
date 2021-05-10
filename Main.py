@@ -16,6 +16,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 ### Functions
 #####################################################################################################################
 
+
 def selectDirectory():
     """Select directory where output CSV's are located.
        Outputs the absolute path of the oldest CSV in the directory."""
@@ -25,15 +26,6 @@ def selectDirectory():
 
 def startProgram():
     '''Main program. Finds newest csv, parses the information and plots it'''
-    print('\n-------' + 'Program started: ' + str(datetime.datetime.now())) ## DEBUG TOOL
-
-    list_of_files = glob.glob("*.csv")  # Creates a list of all CSV's in the directory
-    print('List of files = ' + str(list_of_files)) # Debug
-    list_of_files.sort()
-    print('List of files post sort ' + str(list_of_files))
-    fileName = max(list_of_files, key=os.path.getctime)  # Determines the newest CSV
-    fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
-    print(fileLocation) ## DEBUG TOOL
 
     # Setup left single graph in GUI
     singleGraph = Figure(figsize=(5, 6), dpi=100)
@@ -45,6 +37,23 @@ def startProgram():
     canvas2 = FigureCanvasTkAgg(multipleGraph, master=mainWindow)
     canvas2.get_tk_widget().place(x=470, y=50)
 
+    # Creates a list of all CSV's in the directory
+    list_of_files = glob.glob("*.csv")
+
+    # Restarts 'startProgram' function if no files are present within the directory
+    if len(list_of_files) == 0:
+        errorOutput.delete("1.0", "end")  # Debug Window in GUI
+        errorOutput.insert(END, 'No files in directory @ ' + str(datetime.datetime.now())[:19])
+        time.sleep(5)
+        mainWindow.after(100, startProgram)
+
+    # Finds the newest file in the directory
+    fileName = max(list_of_files, key=os.path.getctime)  # Max value = newest file
+    filenameOutput.delete("1.0", "end")
+    filenameOutput.insert(END, fileName)
+    fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
+
+    # Opens newest CSV from directory
     with open(fileLocation, 'r') as fh:
         reader = csv.reader(fh)
         next(reader)
@@ -52,7 +61,6 @@ def startProgram():
         # Creates a list for each potential ROI.
         x1, x2, x3, x4, x5 = ([] for i in range(5))
         y1, y2, y3, y4, y5 = ([] for i in range(5))
-        print('After reset x1 should = [] -> ' + str(x1)) ## DEBUG TOOL
 
         # Selects specific information from the CSV
         for row in reader:
@@ -77,21 +85,12 @@ def startProgram():
                 x5.append(int(timePoint))
                 y5.append(float(signal))
 
-        if len(x1) > 1:
-            errorOutput.delete("1.0", "end")  # Debug Window in GUI
-            errorOutput.insert(END, 'No error @ ' + str(datetime.datetime.now()))  # Debug Window in GUI
-            print('Before reset, len > 1, x1 = ' + str(x1))  # Debug Tool in command line
-            print('Before reset, len > 1, y1 = ' + str(y1))  # Debug Tool in command line
-            plt = singleGraph.add_subplot(111)
-        else:
-            errorOutput.delete("1.0", "end")  # Debug Window in GUI
-            errorOutput.insert(END, 'Not enough datapoints @ ' + str(datetime.datetime.now()))  # Debug Window in GUI
-            print('Before reset, len <= 1, x1 = ' + str(x1))  # Debug Tool in command line
-            print('Before reset, len <= 1, y1 = ' + str(y1))  # Debug Tool in command line
-            time.sleep(5)
-            mainWindow.after(100, startProgram)
+        errorOutput.delete("1.0", "end")  # Debug Window in GUI
+        errorOutput.insert(END, 'No error @ ' + str(datetime.datetime.now())[:19])  # Debug Window in GUI
+        print('x1 = ' + str(x1))  # Debug Tool in command line
+        print('y1 = ' + str(y1))  # Debug Tool in command line
+        plt = singleGraph.add_subplot(111)
 
-        print('Plotting started @ '+ str(datetime.datetime.now()))
         # If any values exist in the associated ROI list, the values are plotted
         if len(x1) > 0:
             plt.plot(x1, y1, label='ROI 1')
@@ -210,8 +209,6 @@ def startProgram():
             ax5.set_title('ROI 5')
             ax5.set_xlabel("Time")
 
-
-
         mainWindow.after(5000, startProgram)
 
 
@@ -228,8 +225,12 @@ mainWindow['bg'] = 'white'  # Background colour
 Button(mainWindow, text="Open Export Location", command=selectDirectory, height=2, width=30).place(x=10, y=10)
 Button(mainWindow, text="Start", command=startProgram, height=2, width=25).place(x=250, y=10)
 
-errorOutput = Text(mainWindow, width=50, height=1, bg='old lace')
+errorOutput = Text(mainWindow, width=30, height=1, bg='old lace')
 errorOutput.place(x=600, y=10)
 errorOutput.insert(END, 'Program has not started')
+
+filenameOutput = Text(mainWindow, width=30, height=1, bg='old lace')
+filenameOutput.place(x=600, y=32)
+filenameOutput.insert(END, 'No directory selected')
 
 mainWindow.mainloop()
