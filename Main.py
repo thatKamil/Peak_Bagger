@@ -53,6 +53,13 @@ def startProgram():
     filenameOutput.insert(END, fileName)
     fileLocation = mainWindow.directory + '/' + fileName  # Creates absolute path of the newest CSV
 
+    # Finds the row number where Flux data is located (this can change based on user settings)
+    with open(fileLocation, 'r') as fh:
+        reader = csv.reader(fh)
+        readerList = list(reader)
+        readerOutput = readerList[0]
+        fluxPosition = readerOutput.index('Total Flux [p/s]')
+
     # Opens newest CSV from directory
     with open(fileLocation, 'r') as fh:
         reader = csv.reader(fh)
@@ -66,7 +73,7 @@ def startProgram():
         for row in reader:
             timePoint = (row[0])[-2:]
             roi = (row[1])[-1]
-            signal = row[5]
+            signal = row[fluxPosition]
 
             # Assigns specific information to the relevant list.
             if roi == '1':
@@ -87,8 +94,8 @@ def startProgram():
 
         errorOutput.delete("1.0", "end")  # Debug Window in GUI
         errorOutput.insert(END, 'No error @ ' + str(datetime.datetime.now())[:19])  # Debug Window in GUI
-        print('x1 = ' + str(x1))  # Debug Tool in command line
-        print('y1 = ' + str(y1))  # Debug Tool in command line
+        # print('x1 = ' + str(x1))  # Debug Tool in command line
+        # print('y1 = ' + str(y1))  # Debug Tool in command line
         plt = singleGraph.add_subplot(111)
 
         # If any values exist in the associated ROI list, the values are plotted
@@ -104,8 +111,8 @@ def startProgram():
             plt.plot(x5, y5, label='ROI 5')
 
 
-        plt.set_ylabel('Signal (Photons/second)')
-        plt.set_xlabel('Timepoint (Minutes)')
+        plt.set_ylabel('Signal (photons/second)')
+        plt.set_xlabel('Time (min)')
         plt.set_title('All ROIs')
         plt.legend(loc='lower right')
 
@@ -131,6 +138,9 @@ def startProgram():
             ax1.set_ylabel("Signal")
             ax1.set_xlabel("Time")
 
+            multipleGraph.tight_layout()
+
+
         # Generate output graph for 2 ROI's
         if roi_count == 2:
             ax1 = multipleGraph.add_subplot(221)
@@ -143,6 +153,9 @@ def startProgram():
             ax2.plot(x2, y2)
             ax2.set_title('ROI 2')
             ax2.set_xlabel("Time")
+
+            multipleGraph.tight_layout()
+
 
         # Generate output graph for 3 ROI's
         if roi_count == 3:
@@ -162,6 +175,9 @@ def startProgram():
             ax3.set_title('ROI 3')
             ax3.set_xlabel("Time")
 
+            multipleGraph.tight_layout()
+
+
         # Generate output graph for 4 ROI's
         if roi_count == 4:
             ax1 = multipleGraph.add_subplot(221)
@@ -176,12 +192,15 @@ def startProgram():
             ax3 = multipleGraph.add_subplot(223)
             ax3.plot(x3, y3)
             ax3.set_title('ROI 3')
+            ax3.set_ylabel("Signal")
+            ax3.set_xlabel("Time")
 
             ax4 = multipleGraph.add_subplot(224)
             ax4.plot(x4, y4)
             ax4.set_title('ROI 4')
             ax4.set_xlabel("Time")
-            ax4.set_ylabel("Signal")
+
+            multipleGraph.tight_layout()
 
         # Generate output graph for 5 ROI's
         if roi_count == 5:
@@ -208,6 +227,9 @@ def startProgram():
             ax5.plot(x5, y5)
             ax5.set_title('ROI 5')
             ax5.set_xlabel("Time")
+
+            multipleGraph.tight_layout()
+
 
         mainWindow.after(5000, startProgram)
 
