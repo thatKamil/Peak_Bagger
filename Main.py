@@ -77,9 +77,8 @@ def startProgram():
         reader = csv.reader(fh)
         next(reader)
 
-        # Creates a list for each potential ROI.
-        x1, x2, x3, x4, x5 = ([] for i in range(5))
-        y1, y2, y3, y4, y5 = ([] for i in range(5))
+        # Creates a dictionary for each potential ROI.
+        x1d, x2d, x3d, x4d, x5d = ({} for i in range(5))
 
         # Selects specific information from the CSV
         for row in reader:
@@ -87,39 +86,48 @@ def startProgram():
             roi = (row[1])[-1]
             signal = row[5]
 
-            # Assigns specific information to the relevant list.
+            # Assigns specific information to the relevant dictionary.
             if roi == '1':
-                x1.append(int(timePoint))
-                y1.append(float(signal))
+                x1d[int(timePoint)] = float(signal)
             if roi == '2':
-                x2.append(int(timePoint))
-                y2.append(float(signal))
+                x2d[int(timePoint)] = float(signal)
             if roi == '3':
-                x3.append(int(timePoint))
-                y3.append(float(signal))
+                x3d[int(timePoint)] = float(signal)
             if roi == '4':
-                x4.append(int(timePoint))
-                y4.append(float(signal))
+                x4d[int(timePoint)] = float(signal)
             if roi == '5':
-                x5.append(int(timePoint))
-                y5.append(float(signal))
+                x5d[int(timePoint)] = float(signal)
 
         errorOutput.delete("1.0", "end")  # Debug Window in GUI
         errorOutput.insert(END, 'No error @ ' + str(datetime.datetime.now())[:19])  # Debug Window in GUI
-        print('x1 = ' + str(x1))  # Debug Tool in command line
-        print('y1 = ' + str(y1))  # Debug Tool in command line
         plt = singleGraph.add_subplot(111)
 
-        # If any values exist in the associated ROI list, the values are plotted
-        if len(x1) > 0:
+        # If any values exist in the associated ROI list, the values are plotted.
+        # Dictinaries are converted into lists for plotting.
+        if len(x1d) > 0:
+            x1List = x1d.items()
+            x1List = sorted(x1List)
+            x1, y1 = zip(*x1List)
             plt.plot(x1, y1, label='ROI 1')
-        if len(x2) > 0:
+        if len(x2d) > 0:
+            x2List = x2d.items()
+            x2List = sorted(x2List)
+            x2, y2 = zip(*x2List)
             plt.plot(x2, y2, label='ROI 2')
-        if len(x3) > 0:
+        if len(x3d) > 0:
+            x3List = x3d.items()
+            x3List = sorted(x3List)
+            x3, y3 = zip(*x3List)
             plt.plot(x3, y3, label='ROI 3')
-        if len(x4) > 0:
+        if len(x4d) > 0:
+            x4List = x4d.items()
+            x4List = sorted(x4List)
+            x4, y4 = zip(*x4List)
             plt.plot(x4, y4, label='ROI 4')
-        if len(x5) > 0:
+        if len(x5d) > 0:
+            x5List = x5d.items()
+            x5List = sorted(x5List)
+            x5, y5 = zip(*x5List)
             plt.plot(x5, y5, label='ROI 5')
 
         plt.set_ylabel('Signal (photons/second')
@@ -129,15 +137,15 @@ def startProgram():
 
         # Determine number of ROI's
         roi_count = 0
-        if len(x1) > 0:
+        if len(x1d) > 0:
             roi_count += 1
-        if len(x2) > 0:
+        if len(x2d) > 0:
             roi_count += 1
-        if len(x3) > 0:
+        if len(x3d) > 0:
             roi_count += 1
-        if len(x4) > 0:
+        if len(x4d) > 0:
             roi_count += 1
-        if len(x5) > 0:
+        if len(x5d) > 0:
             roi_count += 1
 
 
