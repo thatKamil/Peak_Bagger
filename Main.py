@@ -8,12 +8,16 @@ import glob
 import time
 import psutil
 import datetime
+import pyperclip
 import matplotlib.pyplot as plt
 from tkinter import *
+from decimal import Decimal
 from tkinter import messagebox
 from tkinter import filedialog
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+maxSignalList = []
 
 ######################################################################################################################
 ### Functions
@@ -36,15 +40,18 @@ def selectDirectory():
 def startProgram():
     '''Main program. Finds newest csv, parses the information and plots it'''
 
+    maxSignalOutput.delete(1.0, END)
+    roiOutput.delete(1.0, END)
+
     # Setup left single graph in GUI
     singleGraph = Figure(figsize=(5, 6), dpi=100)
     canvasSingleGraph = FigureCanvasTkAgg(singleGraph, master=mainWindow)
     canvasSingleGraph.get_tk_widget().place(x=10, y=62)
 
     # Setup right multiple graph in GUI
-    multipleGraph = Figure(figsize=(8, 6), dpi=100)
+    multipleGraph = Figure(figsize=(8, 6), dpi=95)
     canvasMultipleGraph = FigureCanvasTkAgg(multipleGraph, master=mainWindow)
-    canvasMultipleGraph.get_tk_widget().place(x=470, y=60)
+    canvasMultipleGraph.get_tk_widget().place(x=490, y=70)
 
     # Creates a list of all CSV's in the directory
     list_of_files = glob.glob("*.csv")
@@ -53,8 +60,7 @@ def startProgram():
     if len(list_of_files) == 0:
         errorOutput.delete("1.0", "end")
         errorOutput.insert(END, 'No files in directory @ ' + str(datetime.datetime.now())[:19])
-        time.sleep(5)
-        mainWindow.after(100, startProgram)
+        return
 
     # Finds the newest file in the directory
     fileName = max(list_of_files, key=os.path.getctime)  # Max value = newest file
@@ -109,26 +115,39 @@ def startProgram():
             x1List = sorted(x1List)
             x1, y1 = zip(*x1List)
             plt.plot(x1, y1, label='ROI 1')
+            maxSignalOutput.insert(END, '%.2E' % Decimal(float(max(y1))) + '\n')
+            roiOutput.insert(END, 'ROI 1:\n')
         if len(x2d) > 0:
             x2List = x2d.items()
             x2List = sorted(x2List)
             x2, y2 = zip(*x2List)
             plt.plot(x2, y2, label='ROI 2')
+            maxSignalOutput.insert(END, '%.2E' % Decimal(float(max(y2))) + '\n')
+            roiOutput.insert(END, 'ROI 2:\n')
         if len(x3d) > 0:
             x3List = x3d.items()
             x3List = sorted(x3List)
             x3, y3 = zip(*x3List)
             plt.plot(x3, y3, label='ROI 3')
+            maxSignalOutput.insert(END, '%.2E' % Decimal(float(max(y3))) + '\n')
+            roiOutput.insert(END, 'ROI 3:\n')
         if len(x4d) > 0:
             x4List = x4d.items()
             x4List = sorted(x4List)
             x4, y4 = zip(*x4List)
             plt.plot(x4, y4, label='ROI 4')
+            maxSignalOutput.insert(END, '%.2E' % Decimal(float(max(y4))) + '\n')
+            roiOutput.insert(END, 'ROI 4:\n')
         if len(x5d) > 0:
             x5List = x5d.items()
             x5List = sorted(x5List)
             x5, y5 = zip(*x5List)
             plt.plot(x5, y5, label='ROI 5')
+            maxSignalOutput.insert(END, '%.2E' % Decimal(float(max(y5))) + '\n')
+            roiOutput.insert(END, 'ROI 5:\n')
+
+        data = maxSignalOutput.get(1.0, "end-1c")
+        pyperclip.copy(data)
 
         plt.set_ylabel('Signal (photons/second')
         plt.set_xlabel('Timepoint (minutes)')
@@ -164,6 +183,9 @@ def startProgram():
 
             multipleGraph.tight_layout()
 
+            maxSignalList.append(max(y1))
+            maxSignalList.append(max(y2))
+
         # Generate output graph for 3 ROI's
         if roi_count == 3:
             ax1 = multipleGraph.add_subplot(221)
@@ -183,6 +205,10 @@ def startProgram():
             ax3.set_ylabel("Signal")
 
             multipleGraph.tight_layout()
+
+            maxSignalList.append(max(y1))
+            maxSignalList.append(max(y2))
+            maxSignalList.append(max(y3))
 
         # Generate output graph for 4 ROI's
         if roi_count == 4:
@@ -206,8 +232,14 @@ def startProgram():
             ax4.set_title('ROI 4')
             ax4.set_xlabel("Time")
 
-
             multipleGraph.tight_layout()
+
+            maxSignalList.append(max(y1))
+            maxSignalList.append(max(y2))
+            maxSignalList.append(max(y3))
+            maxSignalList.append(max(y4))
+            return maxSignalList
+
 
         # Generate output graph for 5 ROI's
         if roi_count == 5:
@@ -237,21 +269,28 @@ def startProgram():
 
             multipleGraph.tight_layout()
 
+            maxSignalList.append(max(y1))
+            maxSignalList.append(max(y2))
+            maxSignalList.append(max(y3))
+            maxSignalList.append(max(y4))
+            maxSignalList.append(max(y5))
+
+
 def useGuide():
     messagebox.showinfo('Use Guide', message="1. Click the 'Export Location' button and select a folder where you will export your .csv files from the IVIS Living Image software, then press OK.\n\n"
                                              "2. Click the 'Start / Update' button\n\n"
                                              "3. Whenever you export a new .csv file from the IVIS Living Image software, click the 'Start / Update' button to refresh the graphs using the most recently generate data.")
 
+
 def about():
     messagebox.showinfo('About', message='IVIS_Peak_Bagger\n\n'
-                                         'Version 1.1\n\n'
-                                         '9th August 2021\n\n'
+                                         'Version 1.2\n\n'
+                                         '12th August 2021\n\n'
                                          'IVIS_Peak_Bagger visualises csv data generated by the IVIS Spectrum\n\n'
                                          'Copyright (c) 2021 Kamil Sokolowski\n\n'
                                          '')
 
-
-######################################################################################################################
+################################################################################`######################################
 ### ''' GUI Interface Setup '''
 ######################################################################################################################
 # Main windows setup
@@ -270,26 +309,32 @@ Button(mainWindow, text="Export Location", command=selectDirectory, height=2, wi
 Button(mainWindow, text="Start / Update", command=startProgram, height=2, width=21, bg='white',
        bd=1, font='Courier', activeforeground='green', relief='ridge').place(x=240, y=10)
 
-Button(mainWindow, text="Use Guide", command=useGuide, height=2, width=15, bg='white',
-       bd=1, font='Courier', activeforeground='blue', relief='ridge').place(x=942, y=10)
+Button(mainWindow, text="Use Guide", command=useGuide, height=2, width=10, bg='white',
+       bd=1, font='Courier', activeforeground='blue', relief='ridge').place(x=1037, y=10)
 
-Button(mainWindow, text="About", command=about, height=2, width=15, bg='white',
-       bd=1, font='Courier', activeforeground='yellow', relief='ridge').place(x=1105, y=10)
+Button(mainWindow, text="About", command=about, height=2, width=10, bg='white',
+       bd=1, font='Courier', activeforeground='yellow', relief='ridge').place(x=1155, y=10)
 
 # Error text box
 errorOutput = Text(mainWindow, width=30, height=1, bg='white', bd=0)
-errorOutput.place(x=500, y=10)
+errorOutput.place(x=480, y=10)
 errorOutput.insert(END, 'Program has not started.')
 
 # Filename text box
 filenameOutput = Text(mainWindow, width=52, height=1, bg='white', bd=0)
-filenameOutput.place(x=499, y=32)
+filenameOutput.place(x=479, y=32)
 filenameOutput.insert(END, 'No directory selected.')
 
 # Memory text box
 memoryOutput = Text(mainWindow, width=20, height=1, bg='white', bd=0)
-memoryOutput.place(x=750, y=10)
+memoryOutput.place(x=730, y=10)
 memoryOutput.insert(END, ('Memory usage: ' + str(psutil.virtual_memory().percent)) + '%')
+
+# Small outputs showing the peak value of each ROI in a text box on screen.
+maxSignalOutput = Text(mainWindow, width=9, height=5, bd=0, font="Courier 8")
+maxSignalOutput.place(x=957, y=1)
+roiOutput = Text(mainWindow, width=6, height=5, bd=0, font="Courier 8")
+roiOutput.place(x=912, y=1)
 
 artASCII = ("""
 
@@ -321,6 +366,7 @@ ___/________/_______\________\__\_/________\_ _/_____/_____________/_______\____
            |_|							             |_|
 """)
 
+# Displays the above art work in a text box at the start of the program.
 artOutput = Text(mainWindow, width=150, height=30, bg='white', bd=0)
 artOutput.place(x=280, y=130)
 artOutput.insert(END, artASCII)
