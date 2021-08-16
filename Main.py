@@ -17,7 +17,6 @@ from tkinter import filedialog
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-maxSignalList = []
 
 ######################################################################################################################
 ### Functions
@@ -36,9 +35,10 @@ def selectDirectory():
     filenameOutput.delete("1.0", "end")
     filenameOutput.insert(END, mainWindow.directory)
 
-
 def startProgram():
     '''Main program. Finds newest csv, parses the information and plots it'''
+
+    maxSignalList = []
 
     maxSignalOutput.delete(1.0, END)
     roiOutput.delete(1.0, END)
@@ -90,7 +90,7 @@ def startProgram():
         for row in reader:
             timePoint = (row[0])[-2:]
             roi = (row[1])[-1]
-            signal = row[5]
+            signal = row[3]
 
             # Assigns specific information to the relevant dictionary.
             if roi == '1':
@@ -238,7 +238,7 @@ def startProgram():
             maxSignalList.append(max(y2))
             maxSignalList.append(max(y3))
             maxSignalList.append(max(y4))
-            return maxSignalList
+
 
 
         # Generate output graph for 5 ROI's
