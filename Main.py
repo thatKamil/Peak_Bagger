@@ -5,7 +5,6 @@
 import csv
 import os
 import glob
-import time
 import psutil
 import datetime
 import pyperclip
