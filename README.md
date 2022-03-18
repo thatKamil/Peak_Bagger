@@ -10,4 +10,6 @@ Peak_Bagger is a tool that visualises each ROI in an image series so as to easil
 
 2. Click the 'Start / Update' button.
 
-3. Whenever you export a new .csv file from the IVIS Living Image software, click the 'Start / Update' button to refresh the graphs using the most recently generate data.
+3. Whenever a new .csv file is exported from the IVIS Living Image software, click the 'Start / Update' button to refresh the graphs. The lastest file is used as a basis to generate the data.
+
+4. Each time 'Start / Update" is run, the highest signal from each ROI is automatically copied to the clipboard. Pasting this data into a spreadsheet at the end of an imaging series will give the peak signal from each ROI, which is the final result most IVIS users will seek.
